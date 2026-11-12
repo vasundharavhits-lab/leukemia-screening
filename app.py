@@ -195,7 +195,7 @@ with left:
                 i2.image(last["cam"], caption="Grad-CAM: rough view of where the model looked",
                          use_container_width=True)
             st.info("Nucleus measurements are shown only for single-cell images. "
-                    "On wide-field smears the segmentation would describe a fragment of the "
+                    "On smear images like these, the segmentation would describe a fragment of the "
                     "image, not the cells, so it is switched off.")
 
         st.markdown("**Clinician review**")

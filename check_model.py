@@ -14,3 +14,7 @@ print("images:", len(y), "| accuracy:", round((p == y).mean(), 4), "| errors:", 
 files = [f for c in CLASSES for f in sorted(glob.glob(os.path.join(c, "*.jpg")))]
 for i in np.where(p != y)[0]:
     print("WRONG:", files[i], "| predicted:", CLASSES[p[i]])
+
+    files = [f for c in CLASSES for f in sorted(glob.glob(os.path.join(c, "*.jpg")))]
+for i in np.where(p != y)[0]:
+    print("WRONG:", files[i], "| predicted:", CLASSES[p[i]])
