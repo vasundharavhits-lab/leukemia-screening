@@ -1,38 +1,36 @@
-# Leukemia screening dashboard (decision support prototype)
+# Leukemia Screening Dashboard (research prototype)
 
-## 1. Put the Kaggle outputs here
-    models/leukemia_effnet.keras
-    models/model_config.json
-    data/test_predictions.csv      (sample data for building Power BI)
+**Not a diagnosis tool.** Every result must be confirmed by a qualified hematologist.
 
-## 2. Run (PowerShell, venv active, from this folder)
-    python -m pip install -r requirements.txt
-    python -m streamlit run app.py
+A Streamlit app that gives a probability of acute lymphoblastic leukemia (ALL) for a blood smear image, with a Grad-CAM view, a login, and a scan log.
 
-Every analyzed image is saved to `scans.db` and mirrored to `exports/scans.csv`.
+## What it does
 
-## 3. Power BI, step by step
-Stage A (day one, no server needed)
- 1. Power BI Desktop -> Get data -> Text/CSV -> exports/scans.csv
- 2. Build visuals: cards (total scans, % flagged), donut (prediction), line (scans per day by scanned_at),
-    bar (by lab), histogram (age), slicers (gender, lab, review_status).
- 3. Click Refresh in Desktop to see new scans.
+- Sign in, enter a patient ID (no names), upload a smear image, and get a result.
+- A MobileNetV2 model classifies four classes (Benign, Early, Pre, Pro). P(leukemia) = 1 - P(Benign), decision threshold 0.50.
+- An input check rejects images that do not look like the training images (photos, black, white, gray, noise) with "Unable to analyze". Rejected images are not saved.
+- Single-cell analysis is switched off: its model has no documented training or validation.
 
-Stage B (company use)
- 1. Move the log to SQL Server / PostgreSQL / Azure SQL: set DATABASE_URL (see src/db.py).
- 2. In Power BI Desktop connect to that database, publish to the Power BI Service,
-    and set scheduled refresh (or DirectQuery with automatic page refresh).
- 3. Embed: Power BI Service -> File -> Embed report -> "Website or portal" (organization users sign in),
-    copy the link, then start the app with it:
-        $env:POWERBI_EMBED_URL = "https://app.powerbi.com/reportEmbed?..."
-        python -m streamlit run app.py
-    The report appears in the top-right panel. Do NOT use "Publish to web": it makes patient data public.
- 4. For viewers without Power BI accounts you need Power BI Embedded with a backend token service.
+## Known limits
 
-## Notes
-* Patient IDs only, never names. Add login and an encrypted database before real use.
-* The OpenCV nucleus features are heuristic. Always check the green outline on the overlay.
-* Validate on your own labelled images: a Kaggle-trained model will drop on a different microscope/stain.
-* Clinical use needs regulatory approval and local validation.
-## what the app does 
-* Research prototype. Analyzes smear images similar to the training dataset and rejects other images with “Unable to analyze.” Results must be confirmed by a qualified hematologist and are not a diagnosis. Not validated on images from other labs or on patient-separated data.
+- Trained and tested on one public dataset (Kaggle: mehradaria/leukemia). The test split was random by image, not by patient, so real accuracy is likely lower.
+- Test accuracy is about 99% (3 to 4 errors out of 489 images). The errors are mostly Early cells called Benign, which is a missed-leukemia error.
+- Confidence is not calibrated: the model can be wrong at 100%.
+- Accuracy drops to about 83 to 85% when a third of the image is hidden, so images must be framed like the dataset's.
+- Not validated on images from other labs, stains, or microscopes.
+- Not cleared for clinical use.
+
+## Setup
+
+1. Python 3.11, then `pip install -r requirements.txt`.
+2. Create a user: see the usage at the top of `manage_users.py`.
+3. Run `streamlit run app.py`.
+
+## Checks
+
+- `python check_model.py` re-checks the model on the 489 test images (needs the test images in `Benign/`, `Early/`, `Pre/`, `Pro/`, which are not in this repository).
+- `validate_model.py` is for validating on new patient-labeled data. Switch analysis on for a new image type only after it passes.
+
+## Data
+
+No images or patient data are stored in this repository. Check the dataset license before sharing a trained model.
