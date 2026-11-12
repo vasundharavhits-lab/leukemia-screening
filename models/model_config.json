@@ -1,0 +1,11 @@
+{
+  "threshold": 0.6780437231063843,
+  "classes": {
+    "0": "Normal (HEM)",
+    "1": "Leukemia (ALL)"
+  },
+  "model_output": "P(leukemia)",
+  "img_size": 224,
+  "input": "RGB, float 0-255, resized to 224x224, NO extra rescaling",
+  "target_sensitivity_on_val": 0.95
+}
