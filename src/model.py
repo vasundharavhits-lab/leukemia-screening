@@ -23,7 +23,7 @@ SINGLE_CORNER_MAX = 15
 SINGLE_DARK_MIN, SINGLE_DARK_MAX = 0.30, 0.98
 ENABLE_SINGLE = False
     # single-cell model is not validated yet; set True to turn it back on
-SMEAR_ENABLED = True    # wide-field model not validated yet; True only after validation
+SMEAR_ENABLED = True    # research prototype: tested only on dataset images; set False to block all analysis.
 
 def _load_cfg(path):
     with open(path) as f:
@@ -58,9 +58,9 @@ def check_image(bgr):
                 if st["dark_fraction"] > SINGLE_DARK_MAX:
                     return None, "The image is almost completely black. No cell was found. Not analyzed."
                 if not ENABLE_SINGLE:
-                    return None, ("This looks like a single-cell image. Single-cell analysis is switched "
-                          "off because it has not been validated yet. Upload a wide-field "
-                          "blood smear image instead. Not analyzed.")
+                    return None, ("This image has a dark background and does not look like a stained "
+                          "blood smear. Single-cell analysis is switched off because it has not been "
+                          "validated, and this app only analyzes stained blood smear images. Not analyzed.")
                 return SINGLE, None
 
     # otherwise it must look like a wide-field blood smear
